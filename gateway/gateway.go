@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"shield/utils"
 	"time"
@@ -78,6 +79,11 @@ func handleClientRequest(client net.Conn) {
 				err = closeErr
 			}
 		}()
+		//todo 增加这里后 好像解决了中途掉线的问题 还有刚开始连接重复掉线
+		_, err := io.Copy(client, remote)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	//todo 将game-server发回来的数据写入到balancer
