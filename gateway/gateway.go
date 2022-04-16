@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"shield/utils"
+	"time"
 )
 
 func Init() {
@@ -18,13 +19,24 @@ func Init() {
 	fmt.Println("启动监听 51777 端口")
 	for {
 		//收到请求
+		// todo 修复错误的连接地址导致的程序崩溃
 		client, err := server.Accept()
 		if err != nil {
-			fmt.Println(err)
-			break
+			panic(err)
+		} else {
+			fmt.Println("连接错误30秒后重试")
+			defer func() {
+				closeErr := client.Close()
+				err := client.Close()
+				if err == nil {
+					err = closeErr
+				}
+				time.Sleep(30 * time.Second)
+			}()
 		}
 		go handleClientRequest(client)
 	}
+
 }
 
 func handleClientRequest(client net.Conn) {
@@ -32,7 +44,13 @@ func handleClientRequest(client net.Conn) {
 	buf := make([]byte, 1024)
 	n, e := client.Read(buf)
 	if e != nil {
-		panic(e)
+		defer func() {
+			closeErr := client.Close()
+			err := client.Close()
+			if err == nil {
+				err = closeErr
+			}
+		}()
 	}
 	fmt.Println("收到来自游戏客户端的数据,大小为:", n)
 	fmt.Println("准备与game-server建立连接发送数据")
@@ -40,17 +58,26 @@ func handleClientRequest(client net.Conn) {
 	//和game-server建立建立连接
 	remote, err := net.Dial("tcp", "127.0.0.1:3389")
 	if err != nil {
-		err := remote.Close()
-		if err != nil {
-			panic(e)
-		}
+		defer func() {
+			closeErr := remote.Close()
+			err := remote.Close()
+			if err == nil {
+				err = closeErr
+			}
+		}()
 	}
 	fmt.Println("连接到 game-server")
 
 	// 把数据写入到game-server
 	n, e = remote.Write(buf[:n])
 	if e != nil {
-		panic(e)
+		defer func() {
+			closeErr := remote.Close()
+			err := remote.Close()
+			if err == nil {
+				err = closeErr
+			}
+		}()
 	}
 
 	//todo 将game-server发回来的数据写入到balancer

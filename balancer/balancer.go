@@ -21,7 +21,7 @@ func Init() {
 
 	for {
 		//收到请求
-		// todo 修复了转发IP错误导致的程序崩溃,可能需要优化
+		// todo 修复错误的连接地址导致的程序崩溃
 		client, err := server.Accept()
 		if err != nil {
 			panic(err)
@@ -33,13 +33,11 @@ func Init() {
 				if err == nil {
 					err = closeErr
 				}
+				time.Sleep(30 * time.Second)
 			}()
-			handleClientRequest(client)
 		}
-		time.Sleep(30 * time.Second)
 		go handleClientRequest(client)
 	}
-
 }
 
 func handleClientRequest(client net.Conn) {
@@ -60,7 +58,7 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("准备与gateway建立连接发送数据")
 
 	//和gateway建立建立连接
-	remote, err := net.Dial("tcp", "152.67.217.198:51777")
+	remote, err := net.Dial("tcp", "101.43.218.210:51777")
 	// todo 修复连接关闭后导致的程序崩溃
 	if err != nil {
 		defer func() {
@@ -74,9 +72,16 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("连接到 gateway")
 
 	// 把数据写入到gateway
+	// todo 关闭gateway后这里还是会导致balancer崩溃
 	n, e = remote.Write(buf[:n])
 	if e != nil {
-		panic(e)
+		defer func() {
+			closeErr := remote.Close()
+			err := remote.Close()
+			if err == nil {
+				err = closeErr
+			}
+		}()
 	}
 
 	//todo 将gateway发回来的数据写入到client
