@@ -13,15 +13,13 @@ func Init() {
 		panic(err)
 		return
 	}
-	fmt.Println("启动监听 51777 端口")
+	fmt.Println("启动监听 3153 端口")
 	for {
 		//收到请求
 		client, err := server.Accept()
 		if err != nil {
-			err := client.Close()
-			if err != nil {
-				panic(err)
-			}
+			fmt.Println(err)
+			break
 		}
 		go handleClientRequest(client)
 	}
@@ -42,7 +40,7 @@ func handleClientRequest(client net.Conn) {
 	if err != nil {
 		err := remote.Close()
 		if err != nil {
-			panic(err)
+			panic(e)
 		}
 	}
 	fmt.Println("连接到 balance")

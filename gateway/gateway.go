@@ -19,9 +19,11 @@ func Init() {
 	for {
 		//收到请求
 		client, err := server.Accept()
-		if err == nil {
-			go handleClientRequest(client)
+		if err != nil {
+			fmt.Println(err)
+			break
 		}
+		go handleClientRequest(client)
 	}
 }
 
@@ -36,11 +38,11 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("准备与game-server建立连接发送数据")
 
 	//和game-server建立建立连接
-	remote, err := net.Dial("tcp", "127.0.0.2:3154")
+	remote, err := net.Dial("tcp", "127.0.0.1:3389")
 	if err != nil {
 		err := remote.Close()
 		if err != nil {
-			panic(err)
+			panic(e)
 		}
 	}
 	fmt.Println("连接到 game-server")
