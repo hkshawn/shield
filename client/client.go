@@ -22,14 +22,14 @@ func Init() {
 		if err != nil {
 			panic(err)
 		} else {
-			fmt.Println("连接错误30秒后重试")
+			fmt.Println("连接错误3秒后重试")
 			defer func() {
 				closeErr := client.Close()
 				err := client.Close()
 				if err == nil {
 					err = closeErr
 				}
-				time.Sleep(30 * time.Second)
+				time.Sleep(3 * time.Second)
 			}()
 		}
 		go handleClientRequest(client)
