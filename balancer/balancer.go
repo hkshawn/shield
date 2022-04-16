@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"shield/utils"
-	"time"
 )
 
 func Init() {
@@ -25,17 +24,7 @@ func Init() {
 		// todo 修复错误的连接地址导致的程序崩溃
 		client, err := server.Accept()
 		if err != nil {
-			panic(err)
-		} else {
-			fmt.Println("连接错误3秒后重试")
-			defer func() {
-				closeErr := client.Close()
-				err := client.Close()
-				if err == nil {
-					err = closeErr
-				}
-				time.Sleep(3 * time.Second)
-			}()
+			fmt.Println("连接出错")
 		}
 		go handleClientRequest(client)
 	}
