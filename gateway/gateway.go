@@ -10,8 +10,10 @@ func Init() {
 	// 监听端口
 	server, err := net.Listen("tcp", ":51777")
 	if err != nil {
-		panic(err)
-		return
+		err := server.Close()
+		if err != nil {
+			panic(err)
+		}
 	}
 	fmt.Println("启动监听 51777 端口")
 	for {
@@ -34,9 +36,12 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("准备与game-server建立连接发送数据")
 
 	//和game-server建立建立连接
-	remote, err := net.Dial("tcp", "127.0.0.1:41999")
+	remote, err := net.Dial("tcp", "127.0.0.2:3154")
 	if err != nil {
-		panic(err)
+		err := remote.Close()
+		if err != nil {
+			panic(err)
+		}
 	}
 	fmt.Println("连接到 game-server")
 

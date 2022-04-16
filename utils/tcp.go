@@ -7,20 +7,36 @@ import (
 
 //tcp数据转发
 func TcpRequest(r net.Conn, w net.Conn) {
-	defer r.Close()
-	defer w.Close()
+	defer func() {
+		//todo 优化defer 连接关闭后不会导致程序崩溃
+		closeErr := r.Close()
+		err := r.Close()
+		if err == nil {
+			err = closeErr
+		}
+	}()
+	defer func() {
+		//todo 优化defer 连接关闭后不会导致程序崩溃
+		closeErr := w.Close()
+		err := w.Close()
+		if err == nil {
+			err = closeErr
+		}
+	}()
 
-	//todo 当游戏客户端退出后 client会报错
+	// todo 把panic(err)修改为break跳出循环,修复了崩溃BUG
 	var buffer = make([]byte, 4096000)
 	for {
 		n, err := r.Read(buffer)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			break
 		}
 		fmt.Println("读取成功,大小:", n)
 		n, err = w.Write(buffer[:n])
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			break
 		}
 		if err != nil {
 			panic(err)

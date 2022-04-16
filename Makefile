@@ -8,3 +8,4 @@ test:
 	GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -extldflags -static" -o bin/server/balancer-linux-arm64 shield/cmd/balancer
 	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -extldflags -static" -o bin/server/gateway-windows-amd64.exe shield/cmd/gateway
 	GOOS=windows GOARCH=386 go build -ldflags "-s -w -extldflags -static" -o bin/server/gateway-windows-386.exe shield/cmd/gateway
+	GOOS=windows GOARCH=386 go build -ldflags "-s -w -extldflags -static" -o bin/server/client-windows-386.exe shield/cmd/client

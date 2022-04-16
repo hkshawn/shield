@@ -8,7 +8,7 @@ import (
 
 func Init() {
 	// 监听端口
-	server, err := net.Listen("tcp", ":41999")
+	server, err := net.Listen("tcp", ":3153")
 	if err != nil {
 		panic(err)
 		return
@@ -18,7 +18,10 @@ func Init() {
 		//收到请求
 		client, err := server.Accept()
 		if err != nil {
-			panic(err)
+			err := client.Close()
+			if err != nil {
+				panic(err)
+			}
 		}
 		go handleClientRequest(client)
 	}
@@ -37,7 +40,10 @@ func handleClientRequest(client net.Conn) {
 	//和balance建立建立连接
 	remote, err := net.Dial("tcp", "152.67.217.198:51777")
 	if err != nil {
-		panic(err)
+		err := remote.Close()
+		if err != nil {
+			panic(err)
+		}
 	}
 	fmt.Println("连接到 balance")
 
