@@ -6,10 +6,11 @@ import (
 )
 
 //tcp数据转发
-func ProxyRequest(r net.Conn, w net.Conn) {
+func TcpRequest(r net.Conn, w net.Conn) {
 	defer r.Close()
 	defer w.Close()
 
+	//todo 当游戏客户端退出后 client会报错
 	var buffer = make([]byte, 4096000)
 	for {
 		n, err := r.Read(buffer)
