@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"shield/utils"
+	"time"
 )
 
 func Init() {
@@ -19,9 +20,12 @@ func Init() {
 	for {
 		//收到请求
 		client, err := server.Accept()
-		if err == nil {
-			go handleClientRequest(client)
+		if err != nil {
+			fmt.Println("h获取y游戏客户端l连接y异常,", err)
+			break
 		}
+
+		go handleClientRequest(client)
 	}
 }
 
@@ -36,19 +40,18 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("准备与gateway建立连接发送数据")
 
 	//和gateway建立建立连接
-	remote, err := net.Dial("tcp", "119.188.247.208:51777")
+	remote, err := net.DialTimeout("tcp", "101.43.218.210:51777", 2*time.Second)
 	if err != nil {
-		err := remote.Close()
-		if err != nil {
-			panic(err)
-		}
+		fmt.Println("与gateway建立连接异常", err)
+		return
 	}
 	fmt.Println("连接到 gateway")
 
 	// 把数据写入到gateway
 	n, e = remote.Write(buf[:n])
 	if e != nil {
-		panic(e)
+		fmt.Println("数据写入gateway异常", err)
+		return
 	}
 
 	//todo 将gateway发回来的数据写入到client

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"shield/utils"
+	"time"
 )
 
 func Init() {
@@ -38,19 +39,18 @@ func handleClientRequest(client net.Conn) {
 	fmt.Println("准备与balancer建立连接发送数据")
 
 	//和balance建立建立连接
-	remote, err := net.Dial("tcp", "152.67.217.198:51777")
+	remote, err := net.DialTimeout("tcp", "152.67.217.198:51777", 2*time.Second)
 	if err != nil {
-		err := remote.Close()
-		if err != nil {
-			panic(err)
-		}
+		fmt.Println("与balancer建立连接异常", err)
+		return
 	}
 	fmt.Println("连接到 balance")
 
 	// 把数据写入到balance
 	n, e = remote.Write(buf[:n])
 	if e != nil {
-		panic(e)
+		fmt.Println("写入balancer异常", err)
+		return
 	}
 
 	//todo 将balcner发回来的数据写入到游戏客户端
