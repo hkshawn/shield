@@ -26,28 +26,32 @@ func TcpRequest(r net.Conn, w net.Conn) {
 	var buffer = make([]byte, 4096000)
 
 	for {
-		if e := r.SetDeadline(time.Now().Add(time.Second * 5)); e != nil {
+		if e := r.SetDeadline(time.Now().Add(time.Second * 20)); e != nil {
 			fmt.Println("设置读取连接超时时间异常:", e)
 		}
-		if e := w.SetDeadline(time.Now().Add(time.Second * 5)); e != nil {
+		if e := w.SetDeadline(time.Now().Add(time.Second * 20)); e != nil {
 			fmt.Println("设置写入连接超时时间异常:", e)
 		}
-		n, err := r.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println("等待数据中---------------------------------------------------------------------")
-				continue
+
+	L:
+		{
+			n, err := r.Read(buffer)
+			if err != nil {
+				if err == io.EOF {
+					//fmt.Println("等待数据中---------------------------------------------------------------------")
+					goto L
+				}
+				fmt.Println(err)
+				break
 			}
-			fmt.Println(err)
-			break
+			//fmt.Println("读取成功,大小:", n)
+			n, err = w.Write(buffer[:n])
+			if err != nil {
+				fmt.Println(err)
+				break
+			}
+			//fmt.Println("写入成功,大小:", n)
 		}
-		fmt.Println("读取成功,大小:", n)
-		n, err = w.Write(buffer[:n])
-		if err != nil {
-			fmt.Println(err)
-			break
-		}
-		fmt.Println("写入成功,大小:", n)
 	}
 }
 
