@@ -22,7 +22,6 @@ func TcpRequest(r net.Conn, w net.Conn) {
 		}
 	}()
 
-	// todo 把panic(err)修改为break跳出循环,修复了崩溃BUG
 	var buffer = make([]byte, 4096000)
 
 	for {
