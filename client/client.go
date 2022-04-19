@@ -27,6 +27,7 @@ func Init() {
 			fmt.Println("接收游戏客户端数据异常", err)
 			break
 		}
+		hasRetryTimes = 0
 		go handleClientRequest(client, *remoteip)
 	}
 }
@@ -47,6 +48,7 @@ func handleClientRequest(client net.Conn, remoteIp string) {
 				time.Sleep(2 * time.Second)
 				handleClientRequest(client, remoteIp)
 			} else {
+				fmt.Println("读取客户端数据包为空,累计已达3次,退出当前conn")
 				return
 			}
 		}
